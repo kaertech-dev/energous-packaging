@@ -187,7 +187,7 @@
     if (!progId) { showMsg(msgProg, "Please enter a prog id.", "error"); return; }
 
     btnProg.disabled = true;
-    const res  = await fetch("/api/check-prog", {
+    const res  = await fetch(APP_ROOT + "/api/check-prog", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prog_id: progId })
@@ -209,7 +209,7 @@
   }
 
   async function submitDecision(decision, remarks = "") {
-    const res  = await fetch("/api/scan-decision", {
+    const res  = await fetch(APP_ROOT + "/api/scan-decision", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -277,8 +277,8 @@
   });
 
   document.getElementById("btn-logout").addEventListener("click", async () => {
-    await fetch("/api/logout", { method: "POST" });
-    window.location.href = "/login";
+    await fetch(APP_ROOT + "/api/logout", { method: "POST" });
+    window.location.href = APP_ROOT + "/login";
   });
 </script>
 {% endblock %}
