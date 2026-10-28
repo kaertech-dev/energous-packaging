@@ -72,10 +72,10 @@ def stations_passed(row: dict) -> bool:
     return all(row.get(s) == 1 for s in REQUIRED_STATIONS)
 
 
-def record_packing(serial_num: str, po_num: str, operator_en: str, shift: str, remarks: str = ""):
+def record_packing(prog_id: str, serial_num: str, po_num: str, operator_en: str, shift: str, remarks: str = ""):
     """
     Atomically:
-      - Set status=1 on an existing failed esense_packaging row, changing no other fields
+      - Set status=1 and update prog_id on an existing failed esense_packaging row
       - Otherwise set packaging=1 in esense_main and insert a new esense_packaging row
     Used for PASS.
     """
@@ -99,10 +99,10 @@ def record_packing(serial_num: str, po_num: str, operator_en: str, shift: str, r
                 cur.execute(
                     """
                     UPDATE energous.esense_packaging
-                    SET status = 1
+                    SET prog_id = %s, status = 1
                     WHERE serial_num = %s AND status = 0
                     """,
-                    (serial_num,)
+                    (prog_id, serial_num)
                 )
                 if cur.rowcount != 1:
                     conn.rollback()
@@ -125,10 +125,10 @@ def record_packing(serial_num: str, po_num: str, operator_en: str, shift: str, r
         cur.execute(
             """
             INSERT INTO energous.esense_packaging
-                (serial_num, po_num, operator_en, shift, date_time, test_rep, remarks, status)
-            VALUES (%s, %s, %s, %s, %s, 1, %s, 1)
+                (serial_num, po_num, operator_en, shift, date_time, prog_id,  test_rep, remarks, status)
+            VALUES (%s, %s, %s, %s, %s, %s, 1, %s, 1)
             """,
-            (serial_num, po_num, operator_en, shift, datetime.now(), remarks)
+            (serial_num, po_num, operator_en, shift, datetime.now(), prog_id, remarks)
         )
 
         conn.commit()
@@ -140,7 +140,7 @@ def record_packing(serial_num: str, po_num: str, operator_en: str, shift: str, r
         conn.close()
 
 
-def record_fail(serial_num: str, po_num: str, operator_en: str, shift: str, reason: str):
+def record_fail(prog_id: str, serial_num: str, po_num: str, operator_en: str, shift: str, reason: str):
     """
     Record a FAIL:
       - Inserts into esense_packaging with serial_num suffixed "_1", "_2", or "_3"
@@ -169,10 +169,10 @@ def record_fail(serial_num: str, po_num: str, operator_en: str, shift: str, reas
         cur.execute(
             """
             INSERT INTO energous.esense_packaging
-                (serial_num, po_num, operator_en, shift, date_time, test_rep, remarks, status)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, 0)
+                (serial_num, po_num, operator_en, shift, date_time, prog_id,  test_rep, remarks, status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 0)
             """,
-            (fail_serial, po_num, operator_en, shift, datetime.now(), repetition, reason)
+            (fail_serial, po_num, operator_en, shift, datetime.now(), prog_id, repetition, reason)
         )
         conn.commit()
         return repetition
@@ -266,7 +266,7 @@ def finalize_scan(prog_id: str, operator_en: str, shift: str, decision: str, rem
         reason = remarks.strip()
         if not reason:
             return {"status": "fail", "message": "A fail reason is required.", "unit": unit}
-        repetition = record_fail(serial_num, unit["po_num"], operator_en, shift, reason)
+        repetition = record_fail(prog_id, serial_num, unit["po_num"], operator_en, shift, reason)
         if repetition is None:
             return {
                 "status": "max_failures",
@@ -281,7 +281,7 @@ def finalize_scan(prog_id: str, operator_en: str, shift: str, decision: str, rem
             "recorded_serial_num": f"{serial_num}_{repetition}",
         }
 
-    if not record_packing(serial_num, unit["po_num"], operator_en, shift, remarks):
+    if not record_packing(prog_id, serial_num, unit["po_num"], operator_en, shift, remarks):
         return {
             "status": "already_packed",
             "message": f"Serial '{serial_num}' was already packed.",

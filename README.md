@@ -13,6 +13,7 @@ timestamps in the `Asia/Manila` timezone. VI reads unit state from
 `energous.esense_main`, and VI scan records and admin reports use the production
 `energous.esense_packaging` table. Operators scan only the Prog ID; the app retrieves
 its associated serial number from `energous.esense_progtest` for validation and
-recording. Failed inspections are recorded with serial suffixes
+recording, and packaging records also store the scanned `prog_id`. Failed
+inspections are recorded with serial suffixes
 `_1` through `_3` and matching `test_rep` values; a fourth FAIL attempt is not
 accepted.

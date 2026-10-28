@@ -58,9 +58,9 @@
     <div class="table-wrap">
       <table class="log-table">
         <thead><tr>
-          <th>Serial</th><th>PO</th><th>Operator</th><th>Shift</th><th>Date/Time</th><th>Status</th><th>Remarks</th>
+          <th>Prog ID</th><th>Serial</th><th>PO</th><th>Operator</th><th>Shift</th><th>Date/Time</th><th>Status</th><th>Remarks</th>
         </tr></thead>
-        <tbody id="log-body"><tr><td colspan="7" class="empty-log">Loading…</td></tr></tbody>
+        <tbody id="log-body"><tr><td colspan="8" class="empty-log">Loading…</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -75,7 +75,7 @@
       <div class="table-wrap">
         <table class="log-table">
           <thead><tr>
-            <th>Serial</th><th>PO</th><th>Shift</th><th>Date/Time</th><th>Status</th>
+            <th>Prog ID</th><th>Serial</th><th>PO</th><th>Shift</th><th>Date/Time</th><th>Status</th>
           </tr></thead>
           <tbody id="modal-body"></tbody>
         </table>
@@ -157,6 +157,7 @@
     const data = await res.json();
     const tbody = document.getElementById("log-body");
     tbody.innerHTML = data.data.map(r => `<tr>
+      <td class="mono">${escapeHTML(r.prog_id || '—')}</td>
       <td class="mono">${escapeHTML(r.serial_num)}</td>
       <td class="mono">${escapeHTML(r.po_num)}</td>
       <td>${escapeHTML(r.operator_en)}</td>
@@ -164,7 +165,7 @@
       <td>${escapeHTML(r.date_time)}</td>
       <td><span class="badge badge-${r.status == 1 ? 'ok' : 'fail'}">${r.status == 1 ? 'PASS' : 'FAIL'}</span></td>
       <td>${escapeHTML(r.remarks || '—')}</td>
-    </tr>`).join("") || '<tr><td colspan="7" class="empty-log">No data.</td></tr>';
+    </tr>`).join("") || '<tr><td colspan="8" class="empty-log">No data.</td></tr>';
   }
 
   // ── Operator Detail Modal ─────────────────────────────────────────────────
@@ -173,12 +174,13 @@
     const data = await res.json();
     document.getElementById("modal-title").textContent = "Operator: " + op;
     document.getElementById("modal-body").innerHTML = data.data.map(r => `<tr>
+      <td class="mono">${escapeHTML(r.prog_id || '—')}</td>
       <td class="mono">${escapeHTML(r.serial_num)}</td>
       <td class="mono">${escapeHTML(r.po_num)}</td>
       <td>${escapeHTML(r.shift)}</td>
       <td>${escapeHTML(r.date_time)}</td>
       <td><span class="badge badge-${r.status == 1 ? 'ok' : 'fail'}">${r.status == 1 ? 'PASS' : 'FAIL'}</span></td>
-    </tr>`).join("") || '<tr><td colspan="5" class="empty-log">No scans.</td></tr>';
+    </tr>`).join("") || '<tr><td colspan="6" class="empty-log">No scans.</td></tr>';
     document.getElementById("modal").classList.remove("hidden");
   }
 

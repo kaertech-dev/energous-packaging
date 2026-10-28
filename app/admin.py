@@ -3,7 +3,7 @@ from app.db import query_all, query_one
 def get_packing_logs(limit: int = 200):
     return query_all(
         """
-        SELECT serial_num, po_num, operator_en, shift, date_time, test_rep, remarks, status
+        SELECT serial_num, po_num, operator_en, shift, date_time, prog_id, test_rep, remarks, status
         FROM energous.esense_packaging
         ORDER BY date_time DESC
         LIMIT %s
@@ -42,7 +42,7 @@ def get_daily_summary():
 def get_recent_by_operator(operator_en: str, limit: int = 50):
     return query_all(
         """
-        SELECT serial_num, po_num, shift, date_time, status, remarks
+        SELECT serial_num, po_num, operator_en, shift, date_time, prog_id, test_rep, remarks, status
         FROM energous.esense_packaging
         WHERE operator_en = %s
         ORDER BY date_time DESC

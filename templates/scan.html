@@ -73,6 +73,7 @@
         <thead>
           <tr>
             <th>#</th>
+            <th>Prog ID</th>
             <th>Serial Number</th>
             <th>PO Number</th>
             <th>Status</th>
@@ -81,7 +82,7 @@
           </tr>
         </thead>
         <tbody id="log-body">
-          <tr id="empty-row"><td colspan="6" class="empty-log">No scans yet. Start scanning above.</td></tr>
+          <tr id="empty-row"><td colspan="7" class="empty-log">No scans yet. Start scanning above.</td></tr>
         </tbody>
       </table>
     </div>
@@ -133,7 +134,7 @@
     el._t = setTimeout(() => el.className = "scan-msg hidden", 4000);
   }
 
-  function addLogRow(serial, po, status, message) {
+  function addLogRow(progId, serial, po, status, message) {
     emptyRow.style.display = "none";
     const idx  = logRows.length + 1;
     const time = new Date().toLocaleTimeString();
@@ -147,6 +148,7 @@
       return td;
     };
     addCell(String(idx));
+    addCell(progId, "mono");
     addCell(serial, "mono");
     addCell(po || "—", "mono");
     const statusCell = addCell("");
@@ -226,12 +228,12 @@
     showMsg(msgSerial, data.message, data.ok ? "success" : "error");
 
     if (data.ok) {
-      addLogRow(loggedSerial, data.unit?.po_num, uiStatus, data.message);
+      addLogRow(verifiedProgId, loggedSerial, data.unit?.po_num, uiStatus, data.message);
       updateCounter(count + 1);
       resetProgStep();
     } else {
       // validation failed on re-check (e.g. stale state) — surface it, keep reason box open on fail
-      addLogRow(verifiedSerial, data.unit?.po_num, uiStatus, data.message);
+      addLogRow(verifiedProgId, verifiedSerial, data.unit?.po_num, uiStatus, data.message);
     }
   }
 
