@@ -31,7 +31,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose Flask port
-EXPOSE 5081
+EXPOSE 5052
 
 # Run the app with a production WSGI server
-CMD ["gunicorn", "--bind", "0.0.0.0:5081", "run:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5052", "run:app"]

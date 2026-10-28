@@ -4,7 +4,7 @@ services:
     image: energous_packaging
     container_name: energous_packaging
     ports:
-      - "5081:5081"
+      - "5052:5052"
     restart: always
     env_file:
       - .env
