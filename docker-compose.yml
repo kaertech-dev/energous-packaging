@@ -1,0 +1,12 @@
+services:
+  energous_packaging:
+    build: .
+    image: energous_packaging
+    container_name: energous_packaging
+    ports:
+      - "5052:5052"
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=production
